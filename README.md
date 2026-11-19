@@ -21,6 +21,18 @@ letters, quizzes and more — and verifies every one of them before you see it.
 | **Asks before acting** | HITL approval gates on L4/L5 actions; bounded deliberation rounds with documented concessions |
 | **Bilingual** | English default, हिंदी one toggle away — commands, summaries, artifacts, landing page |
 
+## Jenni — voice & chat front door (merged from Jennie-Voice-agent-)
+
+**`/jenni.html`** is an installable PWA (voice in, spoken replies, local PIN, notes/tasks/drafts).
+Chat is routed by `agentos/jenni.py`:
+
+| You say | Goes to |
+|---|---|
+| "make a worksheet / question paper / lesson plan / notice…" | NeverMind's 9 validated agents → artifact + verdict in chat |
+| general questions | your LLM (Settings key or `AI_*` env); no key → offline agents |
+
+Voice: browser SpeechRecognition, or Whisper via `/api/voice` when a key is set. One server, one port: `python3 run.py` → `http://localhost:8317/jenni.html`.
+
 ## Quick start
 
 ```bash

@@ -3,6 +3,8 @@
 Endpoints:
   GET  /                      → launch landing page
   GET  /app.html              → control center (dashboard)
+  GET  /jenni.html            → Jenni voice/chat assistant (PWA)
+  POST /api/jenni/chat        → Jenni chat (agents ⇄ LLM routing)
   GET  /api/auth/status|github|me|logout  → GitHub OAuth login flow
   GET  /api/bootstrap         → initial state
   POST /api/command           → issue text/voice command
@@ -43,6 +45,7 @@ from .events import BUS
 from .knowledge_graph import KnowledgeGraph
 from .memory import MemorySystem, LAYERS
 from . import syllabus as SYL
+from . import jenni as JENNI
 from .orchestrator import Orchestrator, detect_lang
 from .rsi import RSIEngine
 from .seed import seed_system
@@ -189,6 +192,12 @@ class Handler(BaseHTTPRequestHandler):
                 return self._static("index.html")
             if path == "/app" or path == "/app.html":
                 return self._static("app.html")
+            if path in ("/jenni", "/jenni.html"):
+                return self._static("jenni.html")
+            if path in ("/jenni-sw.js", "/jenni.webmanifest"):
+                return self._static(path[1:])
+            if path == "/api/jenni/health":
+                return self._json(JENNI.health())
 
             # ---- GitHub OAuth (launch login) --------------------------
             if path == "/api/auth/status":
@@ -535,6 +544,16 @@ class Handler(BaseHTTPRequestHandler):
 
             if path == "/api/voice":
                 return self._transcribe(body)
+
+            if path == "/api/jenni/chat":
+                try:
+                    return self._json(JENNI.chat(ORCH, body))
+                except ValueError as e:
+                    return self._json({"error": {"code": "INVALID_MESSAGES",
+                                                 "message": str(e)}}, 400)
+                except Exception as e:
+                    return self._json({"error": {"code": "AI_ERROR",
+                                                 "message": f"AI request failed: {str(e)[:200]}"}}, 502)
 
             if path.startswith("/api/rsi/") and path.endswith("/promote"):
                 pid = int(path.split("/")[3])

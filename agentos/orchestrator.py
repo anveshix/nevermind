@@ -117,6 +117,10 @@ HI_TOPIC_MAP = {"पार्टनरशिप": "partnership", "पार्�
                 "रीवैल्यूएशन": "revaluation"}
 
 
+# intents Jenni answers conversationally via LLM instead of spawning agent tasks
+ORCH_INTENT_CHAT_SKIP = {"answer", "research_brief"}
+
+
 def detect_lang(text: str) -> str:
     dev = sum(1 for ch in text if "ऀ" <= ch <= "ॿ")
     return "hi" if dev > 3 else "en"
