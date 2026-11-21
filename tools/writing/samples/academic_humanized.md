@@ -1,0 +1,1 @@
+Accountancy (Code 055) is a core subject in Class XII CBSE. The theory paper carries 80 marks. Remembering and Understanding accounts for 32 marks, which is 40 percent of the theory total. Teachers can use this split to plan how much practice time each unit gets.

@@ -1,0 +1,5 @@
+{
+  "C1": {"status": "verified", "source": "agentos/syllabus.py SUBJECTS['Accountancy']: code '055', classes include 'XII'"},
+  "C2": {"status": "verified", "source": "agentos/syllabus.py SUBJECTS['Accountancy']['typology']['total'] = 80"},
+  "C3": {"status": "verified", "source": "agentos/syllabus.py typology row 'Remembering and Understanding': marks 32, pct 40"}
+}

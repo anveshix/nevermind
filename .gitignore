@@ -16,8 +16,10 @@ __pycache__/
 *.log
 .cache/
 
-# tool-private notes
-.claude/
+# tool-private notes (shared Claude skills/commands are tracked)
+.claude/*
+!.claude/skills/
+!.claude/commands/
 
 # editors / OS
 .DS_Store

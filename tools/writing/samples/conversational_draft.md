@@ -1,0 +1,1 @@
+Honestly? Here's the thing: our team's shared drafts are finally here! It's not just a feature, it's a whole new way to work. Two people can edit the same doc at once, and it's free on every plan. Let that sink in.

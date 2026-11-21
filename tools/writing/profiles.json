@@ -1,0 +1,22 @@
+{
+  "content_types": {
+    "cbse_material":   {"detector_context": "technical", "voice": "professional", "max_score": 10},
+    "lesson_plan":     {"detector_context": "technical", "voice": "warm",         "max_score": 10},
+    "official_letter": {"detector_context": "general",   "voice": "professional", "max_score": 5},
+    "report":          {"detector_context": "technical", "voice": "professional", "max_score": 10},
+    "article":         {"detector_context": "general",   "voice": "professional", "max_score": 15},
+    "social_media":    {"detector_context": "marketing", "voice": "casual",       "max_score": 20},
+    "conversational":  {"detector_context": "personal",  "voice": "warm",         "max_score": 20}
+  },
+  "protected_terms": [
+    "CBSE", "NCERT", "UDISE", "Class XI", "Class XII", "Rs", "lakh", "crore",
+    "Hon'ble", "Principal", "Sir", "Madam", "Accountancy", "Business Studies",
+    "Entrepreneurship", "SA1", "SA2", "FA1", "FA2"
+  ],
+  "indian_english": {
+    "dates": "DD/MM/YYYY or DD Month YYYY; keep as written",
+    "currency": "Rs or ₹ with lakh/crore grouping; never convert",
+    "salutations": "keep Sir/Madam and Hon'ble forms of address",
+    "spelling": "Indian English spelling (e.g. programme, centre) unless the author uses otherwise"
+  }
+}
