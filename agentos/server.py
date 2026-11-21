@@ -143,6 +143,43 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt: str, *args: Any) -> None:  # quiet
         pass
 
+    # -- cross-origin bridge (Jenni phone app) ----------------------------
+    # Allowlist only: NEVERMIND_CORS_ORIGINS (comma list). Same-origin UI is
+    # unaffected. If NEVERMIND_API_TOKEN is set, cross-origin API calls must
+    # send it as "Authorization: Bearer <token>".
+    def _cors_origin(self) -> str:
+        origin = self.headers.get("Origin", "")
+        allowed = [o.strip().rstrip("/") for o in os.environ.get(
+            "NEVERMIND_CORS_ORIGINS", "https://anveshix.github.io").split(",") if o.strip()]
+        return origin if origin and origin.rstrip("/") in allowed else ""
+
+    def end_headers(self) -> None:  # noqa: D401
+        origin = self._cors_origin()
+        if origin:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        super().end_headers()
+
+    def _cross_origin_denied(self) -> bool:
+        if not self.headers.get("Origin"):
+            return False
+        if not self._cors_origin():
+            self._json({"error": "origin not allowed"}, 403)
+            return True
+        token = os.environ.get("NEVERMIND_API_TOKEN", "")
+        sent = self.headers.get("Authorization", "").removeprefix("Bearer ").strip()
+        if token and not hmac.compare_digest(sent, token):
+            self._json({"error": "bad or missing token"}, 401)
+            return True
+        return False
+
+    def do_OPTIONS(self) -> None:  # noqa: N802
+        self.send_response(204 if self._cors_origin() else 403)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     # -- helpers -------------------------------------------------------
     def _json(self, obj: Any, status: int = 200) -> None:
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
@@ -180,6 +217,8 @@ class Handler(BaseHTTPRequestHandler):
 
     # ------------------------------------------------------------------
     def do_GET(self) -> None:  # noqa: N802
+        if self._cross_origin_denied():
+            return
         try:
             parsed = urllib.parse.urlparse(self.path)
             path = parsed.path
@@ -497,6 +536,8 @@ class Handler(BaseHTTPRequestHandler):
 
     # ------------------------------------------------------------------
     def do_POST(self) -> None:  # noqa: N802
+        if self._cross_origin_denied():
+            return
         try:
             path = urllib.parse.urlparse(self.path).path
             body = self._read_json()
