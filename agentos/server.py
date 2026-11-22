@@ -143,37 +143,42 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt: str, *args: Any) -> None:  # quiet
         pass
 
-    # -- cross-origin bridge (Jenni phone app) ----------------------------
-    # Allowlist only: NEVERMIND_CORS_ORIGINS (comma list). Same-origin UI is
-    # unaffected. If NEVERMIND_API_TOKEN is set, cross-origin API calls must
-    # send it as "Authorization: Bearer <token>".
+    # -- cross-origin bridge (Jenni on the SAME computer) ------------------
+    # NeverMind's API has no login, so it must never be reachable from the
+    # internet or the LAN through a browser. Cross-origin access is therefore
+    # granted ONLY when (a) the TCP client is this machine (loopback) and (b)
+    # the page's Origin is on a short, exact allowlist (no wildcards).
+    # Same-origin use of the built-in UI is always allowed.
+    _LOOPBACK = ("127.0.0.1", "::1", "::ffff:127.0.0.1")
+
+    def _same_origin(self, origin: str) -> bool:
+        host = self.headers.get("Host", "")
+        return bool(host) and origin in (f"http://{host}", f"https://{host}")
+
     def _cors_origin(self) -> str:
-        origin = self.headers.get("Origin", "")
+        origin = self.headers.get("Origin", "").rstrip("/")
+        if not origin or self.client_address[0] not in self._LOOPBACK:
+            return ""
         allowed = [o.strip().rstrip("/") for o in os.environ.get(
-            "NEVERMIND_CORS_ORIGINS", "https://anveshix.github.io").split(",") if o.strip()]
-        return origin if origin and origin.rstrip("/") in allowed else ""
+            "NEVERMIND_CORS_ORIGINS", "https://anveshix.github.io").split(",")
+            if o.strip() and o.strip() != "*"]
+        return origin if origin in allowed else ""
 
     def end_headers(self) -> None:  # noqa: D401
         origin = self._cors_origin()
         if origin:
             self.send_header("Access-Control-Allow-Origin", origin)
             self.send_header("Vary", "Origin")
-            self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type")
             self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         super().end_headers()
 
     def _cross_origin_denied(self) -> bool:
-        if not self.headers.get("Origin"):
+        origin = self.headers.get("Origin", "").rstrip("/")
+        if not origin or self._same_origin(origin) or self._cors_origin():
             return False
-        if not self._cors_origin():
-            self._json({"error": "origin not allowed"}, 403)
-            return True
-        token = os.environ.get("NEVERMIND_API_TOKEN", "")
-        sent = self.headers.get("Authorization", "").removeprefix("Bearer ").strip()
-        if token and not hmac.compare_digest(sent, token):
-            self._json({"error": "bad or missing token"}, 401)
-            return True
-        return False
+        self._json({"error": "origin not allowed"}, 403)
+        return True
 
     def do_OPTIONS(self) -> None:  # noqa: N802
         self.send_response(204 if self._cors_origin() else 403)
