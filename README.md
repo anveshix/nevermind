@@ -1,5 +1,7 @@
 # NeverMind
 
+**[▶ Open the landing page](https://anveshix.github.io/nevermind/)** · [Deployment](#deployment) · [Project layout](#project-layout)
+
 **The offline-first, constitutionally-governed multi-agent OS for educators.**
 
 NeverMind (formerly *Overmind*) runs a team of **9 specialist agents** and **21 deterministic skills**
@@ -104,4 +106,12 @@ output/             generated artifacts (git-ignored)
 
 ## License
 
-All rights reserved by the repository owner.
+[MIT](LICENSE) © 2026 anveshix. (This replaces the earlier "all rights reserved" notice.)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Report security issues privately as described in [SECURITY.md](SECURITY.md). Never commit `.env`, `github_oauth.json`, `.session_secret` or databases.
+
+## Author
+
+**anveshix** — [github.com/anveshix](https://github.com/anveshix)
