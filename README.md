@@ -106,7 +106,7 @@ output/             generated artifacts (git-ignored)
 
 ## License
 
-[MIT](LICENSE) © 2026 anveshix. (This replaces the earlier "all rights reserved" notice.)
+All rights reserved by the repository owner.
 
 ## Contributing
 
